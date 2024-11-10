@@ -104,6 +104,7 @@ app.get(`/list-rate-res`, async (req, res, n) => {
         },
         select: {
             rate_res_id: true,
+            amount: true,
             restaurent: {
                 select: { res_name: true }
             },
@@ -127,6 +128,7 @@ app.get(`/list-rate-user`, async (req, res, n) => {
         },
         select: {
             like_res_id: true,
+            amount: true,
             users: {
                 select: {
                     full_name: true
@@ -154,14 +156,14 @@ app.post(`/new-rate`, async (req, res, n) => {
     }
     const isRes = await prisma.restaurent.findUnique({
         where: {
-            res_id: res_id * 1
+            res_id: res_id *1
         }
     })
 
     if (!isRes) {
         return res.json(`Nhà hàng không tồn tại`)
     }
-    await prisma.like_res.create({
+    await prisma.rate_res.create({
         data: {
             res_id: res_id * 1,
             user_id: user_id * 1,
@@ -169,7 +171,6 @@ app.post(`/new-rate`, async (req, res, n) => {
         }
     })
     return res.json('Rate success')
-
 })
 const PORT = 3069
 app.listen(PORT, () => {
