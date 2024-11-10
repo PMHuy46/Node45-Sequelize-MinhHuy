@@ -1,0 +1,113 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model food_type {
+  type_id    Int       @id @default(autoincrement())
+  type_name  String?   @db.VarChar(255)
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  updated_at DateTime? @default(now()) @db.Timestamp(0)
+  foods      foods[]
+}
+
+model foods {
+  food_id    Int        @id @default(autoincrement())
+  food_name  String?    @db.VarChar(255)
+  image      String?    @db.VarChar(255)
+  price      Float?     @db.Float
+  descs      String?    @db.VarChar(255)
+  type_id    Int?
+  created_at DateTime?  @default(now()) @db.Timestamp(0)
+  updated_at DateTime?  @default(now()) @db.Timestamp(0)
+  food_type  food_type? @relation(fields: [type_id], references: [type_id], onDelete: NoAction, onUpdate: NoAction, map: "foods_ibfk_1")
+  orders     orders[]
+  sub_food   sub_food[]
+
+  @@index([type_id], map: "type_id")
+}
+
+model like_res {
+  like_res_id Int         @id @default(autoincrement())
+  user_id     Int?
+  res_id      Int?
+  date_rate   DateTime?   @default(now()) @db.DateTime(0)
+  created_at  DateTime?   @default(now()) @db.Timestamp(0)
+  updated_at  DateTime?   @default(now()) @db.Timestamp(0)
+  users       users?      @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "like_res_ibfk_1")
+  restaurent  restaurent? @relation(fields: [res_id], references: [res_id], onDelete: NoAction, onUpdate: NoAction, map: "like_res_ibfk_2")
+
+  @@index([res_id], map: "res_id")
+  @@index([user_id], map: "user_id")
+}
+
+model orders {
+  order_id   Int       @id @default(autoincrement())
+  user_id    Int?
+  food_id    Int?
+  amount     Int?
+  code       String?   @db.VarChar(255)
+  arr_sub_id String?   @db.VarChar(255)
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  updated_at DateTime? @default(now()) @db.Timestamp(0)
+  users      users?    @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "orders_ibfk_1")
+  foods      foods?    @relation(fields: [food_id], references: [food_id], onDelete: NoAction, onUpdate: NoAction, map: "orders_ibfk_2")
+
+  @@index([food_id], map: "food_id")
+  @@index([user_id], map: "user_id")
+}
+
+model rate_res {
+  rate_res_id Int         @id @default(autoincrement())
+  user_id     Int?
+  res_id      Int?
+  amount      Int?
+  date_rate   DateTime?   @default(now()) @db.DateTime(0)
+  created_at  DateTime?   @default(now()) @db.Timestamp(0)
+  updated_at  DateTime?   @default(now()) @db.Timestamp(0)
+  users       users?      @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "rate_res_ibfk_1")
+  restaurent  restaurent? @relation(fields: [res_id], references: [res_id], onDelete: NoAction, onUpdate: NoAction, map: "rate_res_ibfk_2")
+
+  @@index([res_id], map: "res_id")
+  @@index([user_id], map: "user_id")
+}
+
+model restaurent {
+  res_id     Int        @id @default(autoincrement())
+  res_name   String     @db.VarChar(255)
+  Image      String?    @db.VarChar(255)
+  descs      String?    @db.VarChar(255)
+  created_at DateTime?  @default(now()) @db.Timestamp(0)
+  updated_at DateTime?  @default(now()) @db.Timestamp(0)
+  like_res   like_res[]
+  rate_res   rate_res[]
+}
+
+model sub_food {
+  sub_id     Int       @id @default(autoincrement())
+  sub_name   String?   @db.VarChar(255)
+  sub_price  Float?    @db.Float
+  food_id    Int?
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  updated_at DateTime? @default(now()) @db.Timestamp(0)
+  foods      foods?    @relation(fields: [food_id], references: [food_id], onDelete: NoAction, onUpdate: NoAction, map: "sub_food_ibfk_1")
+
+  @@index([food_id], map: "food_id")
+}
+
+model users {
+  user_id    Int        @id @default(autoincrement())
+  full_name  String     @db.VarChar(255)
+  emaiil     String     @db.VarChar(255)
+  pass_word  String?    @db.VarChar(255)
+  created_at DateTime?  @default(now()) @db.Timestamp(0)
+  updated_at DateTime?  @default(now()) @db.Timestamp(0)
+  like_res   like_res[]
+  orders     orders[]
+  rate_res   rate_res[]
+}
